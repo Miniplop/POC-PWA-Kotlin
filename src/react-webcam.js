@@ -156,19 +156,6 @@ export default class Webcam extends Component {
     }
   }
 
-  getScreenshot() {
-    if (!this.state.hasUserMedia) return null;
-
-    const canvas = this.getCanvas();
-    return (
-      canvas &&
-      canvas.toDataURL(
-        this.props.screenshotFormat,
-        this.props.screenshotQuality,
-      )
-    );
-  }
-
   getCanvas() {
     if (!this.state.hasUserMedia || !this.video.videoHeight) return null;
 
@@ -253,26 +240,13 @@ export default class Webcam extends Component {
   }
 
   showResults(results) {
-    let context = this.clearOverlay();
-    let txts = [];
     try {
-      let localization;
       for (var i = 0; i < results.length; ++i) {
         if (results[i].LocalizationResult.ExtendedResultArray[0].Confidence >= 30) {
           const appController = OpenFoodFactsMpp.com.meetup.kotlin.paris.openfoodfacts.getApplicationController();
           appController.getProduct(results[i].BarcodeText, () => null)
-          txts.push(results[i].BarcodeText);
-          localization = results[i].LocalizationResult;
-          this.drawResult(context, localization, results[i].BarcodeText);
         }
       }
-
-      // if (txts.length > 0) {
-      //   alert(txts.join(', '));
-      // }
-      // else {
-      //   this.scanBarcode();
-      // }
       this.scanBarcode();
       
     } catch (e) {
@@ -386,22 +360,25 @@ export default class Webcam extends Component {
 
   render() {
     return (
-      <div id='videoview' width={this.props.width} height={this.props.height}>
-        <button onClick={this.scanBarcode}>Scan Barcodes</button>
-        <video
-          autoPlay
-          width={this.props.width}
-          height={this.props.height}
-          src={this.state.src}
-          muted={this.props.audio}
-          className={this.props.className}
-          playsInline
-          style={this.props.style}
-          ref={(ref) => {
-            this.video = ref;
-          }}
-        />
-        <canvas id="overlay" width={this.props.width} height={this.props.height}></canvas>
+      <div className={"webcamContainer"}>
+        <div id='videoview' width="100%" height="100%">
+          <video
+            autoPlay
+            width="100%" height="100%"
+            src={this.state.src}
+            muted={this.props.audio}
+            className={this.props.className}
+            playsInline
+            style={this.props.style}
+            ref={(ref) => {
+              this.video = ref;
+            }}
+          />
+          <canvas id="overlay" width="100%" height="100%"></canvas>
+        </div>
+        <div className={"buttonContainer"}>
+          <button id="button" onClick={this.scanBarcode}></button>
+        </div>
       </div>
     );
   }

@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<project version="4">
-  <component name="ProjectModuleManager">
-    <modules>
-      <module fileurl="file://$PROJECT_DIR$/.idea/poc-pwa-kotlin.iml" filepath="$PROJECT_DIR$/.idea/poc-pwa-kotlin.iml" />
-      <module fileurl="file://$PROJECT_DIR$/../javascript-barcode/examples/react-wasm-barcode/.idea/react-wasm-barcode.iml" filepath="$PROJECT_DIR$/../javascript-barcode/examples/react-wasm-barcode/.idea/react-wasm-barcode.iml" />
-    </modules>
-  </component>
-</project>
