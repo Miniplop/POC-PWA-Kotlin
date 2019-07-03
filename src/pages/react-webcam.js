@@ -1,6 +1,9 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import './react-webcam.css';
+import {
+  withRouter
+} from 'react-router-dom'
 import OpenFoodFactsMpp from 'OpenFoodFactsMpp';
 
 function hasGetUserMedia() {
@@ -72,13 +75,14 @@ const videoConstraintType = PropTypes.shape({
   width: constrainLongType,
 });
 
-export default class Webcam extends Component {
+class Webcam extends Component {
   static defaultProps = {
     audio: true,
     className: '',
     height: 480,
     imageSmoothing: true,
     onUserMedia: () => {},
+    onScanProduct: () => {},
     onUserMediaError: () => {},
     screenshotFormat: 'image/webp',
     width: 640,
@@ -88,6 +92,7 @@ export default class Webcam extends Component {
   static propTypes = {
     audio: PropTypes.bool,
     onUserMedia: PropTypes.func,
+    onScanProduct: PropTypes.func,
     onUserMediaError: PropTypes.func,
     height: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
     width: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
@@ -156,68 +161,6 @@ export default class Webcam extends Component {
     }
   }
 
-  getCanvas() {
-    if (!this.state.hasUserMedia || !this.video.videoHeight) return null;
-
-    if (!this.ctx) {
-      const canvas = document.createElement('canvas');
-      const aspectRatio = this.video.videoWidth / this.video.videoHeight;
-
-      var canvasWidth = this.props.minScreenshotWidth || this.video.clientWidth;
-      var canvasHeight = canvasWidth / aspectRatio;
-
-      if (this.props.minScreenshotHeight && (canvasHeight < this.props.minScreenshotHeight)) {
-        canvasHeight = this.props.minScreenshotHeight;
-        canvasWidth = canvasHeight * aspectRatio;
-      }
-
-      canvas.width = canvasWidth;
-      canvas.height = canvasHeight;
-
-      this.canvas = canvas;
-      this.ctx = canvas.getContext('2d');
-    }
-
-    const { ctx, canvas } = this;
-    ctx.imageSmoothingEnabled = this.props.imageSmoothing;
-    ctx.drawImage(this.video, 0, 0, canvas.width, canvas.height);
-
-    return canvas;
-  }
-
-  clearOverlay() {
-    let context = document.getElementById('overlay').getContext('2d');
-    context.clearRect(0, 0, this.props.width, this.props.height);
-    context.strokeStyle = '#ff0000';
-    context.lineWidth = 5;
-    return context;
-  }
-  
-  drawResult(context, localization, text) {
-    context.beginPath();
-    context.moveTo(localization.X1, localization.Y1);
-    context.lineTo(localization.X2, localization.Y2);
-    context.lineTo(localization.X3, localization.Y3);
-    context.lineTo(localization.X4, localization.Y4);
-    context.lineTo(localization.X1, localization.Y1);
-    context.stroke();
-  
-    context.font = '18px Verdana';
-    context.fillStyle = '#ff0000';
-    let x = [ localization.X1, localization.X2, localization.X3, localization.X4 ];
-    let y = [ localization.Y1, localization.Y2, localization.Y3, localization.Y4 ];
-    x.sort(function(a, b) {
-      return a - b;
-    });
-    y.sort(function(a, b) {
-      return b - a;
-    });
-    let left = x[0];
-    let top = y[0];
-  
-    context.fillText(text, left, top + 50);
-  }
-
   scanBarcode() {
     if (window.reader) {
       let canvas = document.createElement('canvas');
@@ -244,11 +187,15 @@ export default class Webcam extends Component {
       for (var i = 0; i < results.length; ++i) {
         if (results[i].LocalizationResult.ExtendedResultArray[0].Confidence >= 30) {
           const appController = OpenFoodFactsMpp.com.meetup.kotlin.paris.openfoodfacts.getApplicationController();
-          appController.getProduct(results[i].BarcodeText, () => null)
+          appController.getProduct(results[i].BarcodeText, (result, error) => {
+            this.props.onScanProduct(result);
+            this.props.history.push('/product')
+          })
         }
       }
-      this.scanBarcode();
-      
+      if(results.length < 1) {
+        this.scanBarcode();
+      }
     } catch (e) {
       this.scanBarcode();
     }
@@ -383,3 +330,5 @@ export default class Webcam extends Component {
     );
   }
 }
+
+export default withRouter(Webcam)

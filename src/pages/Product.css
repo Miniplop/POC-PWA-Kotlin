@@ -1,0 +1,49 @@
+.ProductPropertyContainer {
+  margin-bottom: 12px;
+}
+
+.ProductProperty {
+  font-family: Roboto;
+  font-size: 15px;
+  line-height: 1.53;
+  color: #1d1e2c;
+  font-weight: 500;
+}
+
+.ProductName {
+  font-family: Roboto;
+  font-size: 18px;
+  font-weight: bold;
+  line-height: 1.33;
+  color: #1d1e2c;
+}
+.Brand {
+  font-family: Roboto;
+  font-size: 15px;
+  font-style: italic;
+  line-height: 1.33;
+  color: #1d1e2c;
+}
+
+.NutriScoreImage {
+  height: 42px;
+}
+
+.ProductImage {
+  height: 280px;
+}
+
+.ProductContentContainer {
+  padding: 16px 24px;
+}
+
+.ProductContentTitlesInnerContainer {
+  display: flex;
+  flex-direction: column;
+}
+
+.ProductContentTitlesOuterContainer {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 22px;
+}
